@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Detection Results</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f0f0f0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .image-container {
+            position: relative;
+            display: inline-block;
+            margin: 20px 0;
+        }
+        .detected-image {
+            max-width: 100%;
+            height: auto;
+        }
+        .object-box {
+            position: absolute;
+            border: 3px solid;
+            background: transparent;
+        }
+        .object-label {
+            position: absolute;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .objects-list {
+            margin-top: 20px;
+        }
+        .object-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔍 Object Detection Results</h1>
+            <p id="objectCount">Found 0 objects in your image</p>
+        </div>
+        <div class="image-container" id="imageContainer">
+            <img src="" alt="Detected Objects" class="detected-image" id="detectedImage">
+        </div>
+        <div class="objects-list">
+            <h3>📋 Detected Objects</h3>
+            <div id="objectsList"></div>
+        </div>
+    </div>
+
+    <script>
+        const colors = ["#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4", "#FFEAA7", "#DDA0DD", "#98D8C8", "#F7DC6F"];
+        
+        function drawObjectBoxes(objects) {
+            const image = document.getElementById("detectedImage");
+            const container = document.getElementById("imageContainer");
+            
+            image.onload = function() {
+                const imageRect = image.getBoundingClientRect();
+                const scaleX = imageRect.width / image.naturalWidth;
+                const scaleY = imageRect.height / image.naturalHeight;
+                
+                objects.forEach((obj, index) => {
+                    const box = document.createElement("div");
+                    box.className = "object-box";
+                    box.style.borderColor = colors[index % colors.length];
+                    
+                    const x = obj.bbox[0] * scaleX;
+                    const y = obj.bbox[1] * scaleY;
+                    const width = obj.bbox[2] * scaleX;
+                    const height = obj.bbox[3] * scaleY;
+                    
+                    box.style.left = x + "px";
+                    box.style.top = y + "px";
+                    box.style.width = width + "px";
+                    box.style.height = height + "px";
+                    
+                    const label = document.createElement("div");
+                    label.className = "object-label";
+                    label.style.left = x + "px";
+                    label.style.top = (y - 25) + "px";
+                    label.textContent = obj.name + " " + Math.round(obj.confidence * 100) + "%";
+                    
+                    container.appendChild(box);
+                    container.appendChild(label);
+                });
+            };
+        }
+        
+        function displayObjects(objects) {
+            const objectCount = document.getElementById("objectCount");
+            const objectsList = document.getElementById("objectsList");
+            
+            objectCount.textContent = "Found " + objects.length + " objects in your image";
+            
+            objectsList.innerHTML = "";
+            objects.forEach(obj => {
+                const item = document.createElement("div");
+                item.className = "object-item";
+                item.innerHTML = "<strong>" + obj.name + "</strong> - Confidence: " + Math.round(obj.confidence * 100) + "%";
+                objectsList.appendChild(item);
+            });
+        }
+        
+        // Get data from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const imageData = urlParams.get('image');
+        const objectsData = urlParams.get('objects');
+        
+        if (imageData && objectsData) {
+            document.getElementById("detectedImage").src = imageData;
+            const objects = JSON.parse(decodeURIComponent(objectsData));
+            displayObjects(objects);
+            drawObjectBoxes(objects);
+        }
+    </script>
+</body>
+</html>

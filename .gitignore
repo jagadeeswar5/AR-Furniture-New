@@ -1,0 +1,45 @@
+﻿.env
+processed/
+used photos/
+AR pictures/
+test-*.html
+quick-test.html
+debug-app.html
+comprehensive-test.html
+mobile-ar-test.html
+*.json
+backend/.env
+backend/processed/
+backend/cabinets_response.json
+backend/furniture_response.json
+backend/AR-Furniture-App.code-workspace
+backend/SegDrawer/
+env/
+backend/env/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Large AI model files (will be downloaded automatically)
+*.pth
+*.pt
+*.safetensors
+backend/models/
+backend/sam2_hiera_tiny.pt

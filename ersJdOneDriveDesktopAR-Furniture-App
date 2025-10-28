@@ -1,0 +1,34 @@
+[33m0939668[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mclean-version[m[33m)[m Add requirements.txt
+A	backend/requirements.txt
+[33mee0e144[m Docs: add comprehensive comments to frontend functions for professor walkthrough
+M	frontend/index.html
+[33m474b896[m Docs: add comprehensive function comments explaining purpose and usage for professor walkthrough
+M	backend/main.py
+[33meecd251[m Docs: add clear docstrings, explanations, and intent-revealing comments to backend/main.py
+M	backend/main.py
+[33m4d3aca3[m cleaning code
+R100	backend/experiments/ai_object_detection.py	backend/Endpoints/ai_object_detection.py
+R100	backend/experiments/background_inpainting.py	backend/Endpoints/background_inpainting.py
+R100	backend/experiments/direct_erasure.py	backend/Endpoints/direct_erasure.py
+R100	backend/experiments/inpainting.py	backend/Endpoints/inpainting.py
+R100	backend/experiments/lighting_preserving_replacement.py	backend/Endpoints/lighting_preserving_replacement.py
+R100	backend/experiments/precise_replacement.py	backend/Endpoints/precise_replacement.py
+R100	backend/experiments/simple_replacement.py	backend/Endpoints/simple_replacement.py
+R100	backend/experiments/true_replacement.py	backend/Endpoints/true_replacement.py
+[33m5f5b9ec[m Chore: move experimental backend scripts into backend/experiments/
+R100	backend/ai_object_detection.py	backend/experiments/ai_object_detection.py
+R100	backend/background_inpainting.py	backend/experiments/background_inpainting.py
+R100	backend/direct_erasure.py	backend/experiments/direct_erasure.py
+R100	backend/inpainting.py	backend/experiments/inpainting.py
+R100	backend/lighting_preserving_replacement.py	backend/experiments/lighting_preserving_replacement.py
+R100	backend/precise_replacement.py	backend/experiments/precise_replacement.py
+R100	backend/simple_replacement.py	backend/experiments/simple_replacement.py
+R100	backend/true_replacement.py	backend/experiments/true_replacement.py
+[33m3bc7a6a[m Limit AR instructions to Android only: remove iOS quick look text and ar-modes
+M	frontend/index.html
+[33m926c43d[m Update README.md
+M	README.md
+[33mcd73b06[m Update README.md
+M	README.md
+[33mc0ca9b5[m Create README.md
+A	README.md

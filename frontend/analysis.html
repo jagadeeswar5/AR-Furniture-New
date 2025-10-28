@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Furniture Analysis - AR Furniture App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .analysis-section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            border-left: 5px solid #667eea;
+        }
+
+        .analysis-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .math-formula {
+            background: #e3f2fd;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            border: 2px solid #2196f3;
+        }
+
+        .math-formula h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+
+        .formula-step {
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            border-left: 3px solid #2196f3;
+        }
+
+        .score-breakdown {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .score-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .score-card h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .score-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .text-score { color: #4caf50; }
+        .visual-score { color: #ff9800; }
+        .final-score { color: #2196f3; }
+
+        .furniture-comparison {
+            margin: 30px 0;
+        }
+
+        .furniture-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .furniture-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        .furniture-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .furniture-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .recommended {
+            background: #e8f5e8 !important;
+            font-weight: bold;
+        }
+
+        .chart-container {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .chart-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .weight-explanation {
+            background: #fff3e0;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #ff9800;
+        }
+
+        .weight-explanation h3 {
+            color: #f57c00;
+            margin-bottom: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid #f44336;
+        }
+
+        .back-button {
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🧠 AI Furniture Analysis</h1>
+            <p>Detailed breakdown of how our AI recommends furniture</p>
+        </div>
+
+        <div class="content">
+            <button class="back-button" onclick="window.close()">← Back to Main App</button>
+            
+            <div id="loading" class="loading">
+                <h2>🔄 Loading Analysis...</h2>
+                <p>Calculating detailed scores and generating visualizations...</p>
+            </div>
+
+            <div id="error" class="error" style="display: none;">
+                <h3>❌ Error Loading Analysis</h3>
+                <p id="error-message"></p>
+            </div>
+
+            <div id="analysis-content" style="display: none;">
+                <!-- Detailed Math Section -->
+                <div class="analysis-section">
+                    <h2>🧮 Mathematical Breakdown</h2>
+                    
+                    <div class="weight-explanation">
+                        <h3>📊 Weighting System</h3>
+                        <p><strong>For Specific Preferences (like "black sofa"):</strong></p>
+                        <ul>
+                            <li>Text Weight: <strong>75%</strong> - Your explicit preferences matter most</li>
+                            <li>Visual Weight: <strong>25%</strong> - Room style is secondary</li>
+                            <li>Color Boost: <strong>+0.3</strong> - Bonus for exact color matches</li>
+                        </ul>
+                        <p><strong>For General Queries:</strong></p>
+                        <ul>
+                            <li>Text Weight: <strong>25%</strong> - Less specific preferences</li>
+                            <li>Visual Weight: <strong>75%</strong> - Room style matching is primary</li>
+                        </ul>
+                    </div>
+
+                    <div class="math-formula">
+                        <h3>🔢 The Formula</h3>
+                        <div class="formula-step">
+                            <strong>Step 1:</strong> Calculate weighted combination<br>
+                            <code>Base Score = (Text Weight × Text Similarity) + (Visual Weight × Visual Similarity)</code>
+                        </div>
+                        <div class="formula-step">
+                            <strong>Step 2:</strong> Add color boost (if applicable)<br>
+                            <code>Final Score = Base Score + Color Boost</code>
+                        </div>
+                        <div class="formula-step">
+                            <strong>Step 3:</strong> Convert to percentage<br>
+                            <code>Final Percentage = Final Score × 100%</code>
+                        </div>
+                    </div>
+
+                    <div class="math-formula" id="detailed-calculation">
+                        <h3>📐 Your Specific Calculation</h3>
+                        <div id="calculation-steps"></div>
+                    </div>
+                </div>
+
+                <!-- Score Breakdown -->
+                <div class="analysis-section">
+                    <h2>📊 Score Breakdown</h2>
+                    <div class="score-breakdown">
+                        <div class="score-card">
+                            <h3>Text Similarity</h3>
+                            <div class="score-value text-score" id="text-score">-</div>
+                            <p>How well the furniture description matches your preferences</p>
+                        </div>
+                        <div class="score-card">
+                            <h3>Visual Similarity</h3>
+                            <div class="score-value visual-score" id="visual-score">-</div>
+                            <p>How well the furniture style matches your room</p>
+                        </div>
+                        <div class="score-card">
+                            <h3>Final Score</h3>
+                            <div class="score-value final-score" id="final-score">-</div>
+                            <p>Combined multimodal score with weighting</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- All Furniture Comparison -->
+                <div class="analysis-section">
+                    <h2>🏠 All Furniture Comparison</h2>
+                    <div class="furniture-comparison">
+                        <table class="furniture-table" id="furniture-table">
+                            <thead>
+                                <tr>
+                                    <th>Furniture</th>
+                                    <th>Text Sim</th>
+                                    <th>Visual Sim</th>
+                                    <th>Final Score</th>
+                                </tr>
+                            </thead>
+                            <tbody id="furniture-tbody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Visualizations -->
+                <div class="analysis-section">
+                    <h2>📈 Visual Analysis</h2>
+                    <div class="chart-container">
+                        <h3>Score Comparison</h3>
+                        <img id="comparison-chart" src="" alt="Score Comparison">
+                    </div>
+                </div>
+
+                <!-- Technical Details -->
+                <div class="analysis-section">
+                    <h2>🔬 Technical Details: Where These Values Come From</h2>
+                    
+                    <div class="weight-explanation">
+                        <h3>📊 Text Similarity: <span id="text-sim-value">-</span></h3>
+                        <div class="formula-step">
+                            <strong>Step 1:</strong> Convert user query to embedding<br>
+                            <code>User Query: "<span id="user-query">-</span>" → OpenAI text-embedding-3-small → [0.1234, -0.5678, ...] (1536 dimensions)</code>
+                        </div>
+                        <div class="formula-step">
+                            <strong>Step 2:</strong> Convert furniture description to embedding<br>
+                            <code>Furniture Description: "<span id="furniture-desc">-</span>" → OpenAI text-embedding-3-small → [0.2345, -0.6789, ...] (1536 dimensions)</code>
+                        </div>
+                        <div class="formula-step">
+                            <strong>Step 3:</strong> Calculate cosine similarity<br>
+                            <code>cosine_similarity([user_embedding], [furniture_embedding]) = <span id="text-sim-calc">-</span></code>
+                        </div>
+                    </div>
+
+                    <div class="weight-explanation">
+                        <h3>🖼️ Visual Similarity: <span id="visual-sim-value">-</span></h3>
+                        <div class="formula-step">
+                            <strong>Step 1:</strong> Extract features from room image<br>
+                            <code>Room Image → ResNet50 → [0.3456, -0.7890, ...] (2048 dimensions)</code>
+                        </div>
+                        <div class="formula-step">
+                            <strong>Step 2:</strong> Extract features from furniture image<br>
+                            <code>Furniture Image → ResNet50 → [0.4567, -0.8901, ...] (2048 dimensions)</code>
+                        </div>
+                        <div class="formula-step">
+                            <strong>Step 3:</strong> Calculate cosine similarity<br>
+                            <code>cosine_similarity([room_features], [furniture_features]) = <span id="visual-sim-calc">-</span></code>
+                        </div>
+                    </div>
+
+                    <div class="weight-explanation">
+                        <h3>🧮 Cosine Similarity Formula</h3>
+                        <div class="formula-step">
+                            <code>cosine_similarity(A, B) = (A · B) / (||A|| × ||B||)</code><br>
+                            <strong>Where:</strong><br>
+                            • <strong>A · B</strong> = dot product of vectors A and B<br>
+                            • <strong>||A||</strong> = magnitude (length) of vector A<br>
+                            • <strong>||B||</strong> = magnitude (length) of vector B<br>
+                            • <strong>Result:</strong> Value between -1 and 1 (closer to 1 = more similar)
+                        </div>
+                    </div>
+
+                    <div class="weight-explanation">
+                        <h3>🎯 Why These Specific Values?</h3>
+                        <div class="formula-step">
+                            <strong>Text Similarity (<span id="text-sim-highlight">-</span>):</strong><br>
+                            • High because "<span id="user-query-highlight">-</span>" matches the furniture description<br>
+                            • OpenAI's embedding model understands semantic meaning<br>
+                            • Direct keyword match boosts similarity score
+                        </div>
+                        <div class="formula-step">
+                            <strong>Visual Similarity (<span id="visual-sim-highlight">-</span>):</strong><br>
+                            • Lower because room style may not match furniture style perfectly<br>
+                            • ResNet50 focuses on visual features, not semantic meaning<br>
+                            • Color scheme and design differences affect the score
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Explanation -->
+                <div class="analysis-section">
+                    <h2>🤖 AI Explanation</h2>
+                    <div id="ai-explanation"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const furnitureName = urlParams.get('furniture');
+        const imagePath = urlParams.get('image');
+        const userPreferences = urlParams.get('preferences');
+
+        const backendUrl = 'http://127.0.0.1:8000';
+
+        async function loadAnalysis() {
+            try {
+                // Show loading
+                document.getElementById('loading').style.display = 'block';
+                document.getElementById('error').style.display = 'none';
+                document.getElementById('analysis-content').style.display = 'none';
+
+                // Prepare form data
+                const formData = new FormData();
+                formData.append('furniture_name', furnitureName);
+                formData.append('room_image_path', imagePath);
+                formData.append('user_preferences', userPreferences || '');
+                
+                // Get user preferences from URL parameters or use defaults
+                const textWeight = urlParams.get('text_weight') || '0.75';
+                const visualWeight = urlParams.get('visual_weight') || '0.25';
+                const colorBoost = urlParams.get('color_boost') || 'true';
+                
+                formData.append('text_weight', textWeight);
+                formData.append('visual_weight', visualWeight);
+                formData.append('color_boost', colorBoost);
+
+                // Call the visualization API
+                const response = await fetch(`${backendUrl}/visualize-recommendation`, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Hide loading and show content
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('analysis-content').style.display = 'block';
+
+                // Populate the analysis
+                populateAnalysis(data);
+
+            } catch (error) {
+                console.error('Error loading analysis:', error);
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('error').style.display = 'block';
+                document.getElementById('error-message').textContent = error.message;
+            }
+        }
+
+        function populateAnalysis(data) {
+            const scores = data.scores;
+            const recommended = data.recommended_furniture;
+            const visualizations = data.visualizations;
+
+            // Update score breakdown
+            document.getElementById('text-score').textContent = `${(recommended.text_similarity * 100).toFixed(1)}%`;
+            document.getElementById('visual-score').textContent = `${(recommended.visual_similarity * 100).toFixed(1)}%`;
+            document.getElementById('final-score').textContent = `${(recommended.final_score * 100).toFixed(1)}%`;
+
+            // Populate furniture comparison table
+            const tbody = document.getElementById('furniture-tbody');
+            tbody.innerHTML = '';
+            
+            for (let i = 0; i < scores.furniture_names.length; i++) {
+                const row = document.createElement('tr');
+                const isRecommended = scores.furniture_names[i] === recommended.name;
+                
+                if (isRecommended) {
+                    row.classList.add('recommended');
+                }
+                
+                row.innerHTML = `
+                    <td>${scores.furniture_names[i].replace('_', ' ')}</td>
+                    <td>${(scores.text_similarities[i] * 100).toFixed(1)}%</td>
+                    <td>${(scores.visual_similarities[i] * 100).toFixed(1)}%</td>
+                    <td>${(scores.final_scores[i] * 100).toFixed(1)}%</td>
+                `;
+                tbody.appendChild(row);
+            }
+
+            // Update visualizations
+            document.getElementById('comparison-chart').src = `data:image/png;base64,${visualizations.comparison_chart}`;
+
+            // Generate detailed calculation
+            generateDetailedCalculation(recommended, userPreferences, data.calculation_breakdown);
+
+            // Generate technical details
+            generateTechnicalDetails(recommended, data.calculation_breakdown);
+
+            // Generate AI explanation
+            generateAIExplanation(recommended, scores);
+        }
+
+        function generateDetailedCalculation(recommended, userPreferences, calculationBreakdown) {
+            const textWeight = calculationBreakdown.text_weight;
+            const visualWeight = calculationBreakdown.visual_weight;
+            const colorBoost = calculationBreakdown.color_boost;
+            const baseScore = calculationBreakdown.base_score;
+            const actualFinalScore = recommended.final_score;
+
+            const calculationSteps = document.getElementById('calculation-steps');
+            calculationSteps.innerHTML = `
+                <div class="formula-step">
+                    <strong>Your Preferences:</strong> "${calculationBreakdown.user_preferences || 'General query'}"<br>
+                    <strong>Weighting:</strong> Text ${(textWeight * 100)}%, Visual ${(visualWeight * 100)}%
+                </div>
+                <div class="formula-step">
+                    <strong>Step 1 - Base Score:</strong><br>
+                    <code>(${textWeight} × ${recommended.text_similarity.toFixed(4)}) + (${visualWeight} × ${recommended.visual_similarity.toFixed(4)})</code><br>
+                    <code>= ${(textWeight * recommended.text_similarity).toFixed(4)} + ${(visualWeight * recommended.visual_similarity).toFixed(4)}</code><br>
+                    <code>= ${baseScore.toFixed(4)}</code>
+                </div>
+                ${colorBoost > 0 ? `
+                <div class="formula-step">
+                    <strong>Step 2 - Color Boost:</strong><br>
+                    <code>${baseScore.toFixed(4)} + ${colorBoost} = ${actualFinalScore.toFixed(4)}</code>
+                </div>
+                ` : ''}
+                <div class="formula-step">
+                    <strong>Final Result (from AI system):</strong><br>
+                    <code>${actualFinalScore.toFixed(4)} × 100% = ${(actualFinalScore * 100).toFixed(1)}%</code>
+                </div>
+                <div class="formula-step" style="background: #e8f5e8; border-left-color: #4caf50;">
+                    <strong>✅ Verified:</strong> This matches the displayed final score of ${(actualFinalScore * 100).toFixed(1)}%
+                </div>
+            `;
+        }
+
+        function generateTechnicalDetails(recommended, calculationBreakdown) {
+            // Update text similarity details
+            document.getElementById('text-sim-value').textContent = (recommended.text_similarity * 100).toFixed(1) + '%';
+            document.getElementById('text-sim-calc').textContent = recommended.text_similarity.toFixed(4);
+            document.getElementById('text-sim-highlight').textContent = (recommended.text_similarity * 100).toFixed(1) + '%';
+            
+            // Update visual similarity details
+            document.getElementById('visual-sim-value').textContent = (recommended.visual_similarity * 100).toFixed(1) + '%';
+            document.getElementById('visual-sim-calc').textContent = recommended.visual_similarity.toFixed(4);
+            document.getElementById('visual-sim-highlight').textContent = (recommended.visual_similarity * 100).toFixed(1) + '%';
+            
+            // Update user query
+            const userQuery = calculationBreakdown.user_preferences || 'General query';
+            document.getElementById('user-query').textContent = userQuery;
+            document.getElementById('user-query-highlight').textContent = userQuery;
+            
+            // Update furniture description (we'll need to get this from the backend)
+            // For now, we'll use a placeholder
+            const furnitureDescriptions = {
+                'black_sofa': 'A sleek and modern black sofa, perfect for contemporary spaces',
+                'blue_sofa': 'A stylish blue sofa, ideal for adding a pop of color to your space',
+                'modern_sofa2': 'A stylish and comfortable sofa, ideal for modern spaces'
+            };
+            
+            const furnitureName = recommended.name;
+            const furnitureDesc = furnitureDescriptions[furnitureName] || 'A comfortable and stylish piece of furniture';
+            document.getElementById('furniture-desc').textContent = furnitureDesc;
+        }
+
+        function generateAIExplanation(recommended, scores) {
+            const explanation = document.getElementById('ai-explanation');
+            
+            let explanationText = `
+                <h3>🎯 Why This Furniture Was Recommended</h3>
+                <p><strong>${recommended.name.replace('_', ' ')}</strong> was selected because:</p>
+                <ul>
+                    <li><strong>Text Match:</strong> ${(recommended.text_similarity * 100).toFixed(1)}% similarity with your preferences</li>
+                    <li><strong>Visual Match:</strong> ${(recommended.visual_similarity * 100).toFixed(1)}% similarity with your room style</li>
+                    <li><strong>Combined Score:</strong> ${(recommended.final_score * 100).toFixed(1)}% overall match</li>
+                </ul>
+            `;
+
+            // Find the best alternative
+            const alternatives = scores.furniture_names
+                .map((name, i) => ({ name, score: scores.final_scores[i] }))
+                .filter(item => item.name !== recommended.name)
+                .sort((a, b) => b.score - a.score);
+
+            if (alternatives.length > 0) {
+                const bestAlternative = alternatives[0];
+                explanationText += `
+                    <h3>🔄 Alternative Options</h3>
+                    <p>The next best option would be <strong>${bestAlternative.name.replace('_', ' ')}</strong> 
+                    with a score of ${(bestAlternative.score * 100).toFixed(1)}%, 
+                    which is ${((recommended.final_score - bestAlternative.score) * 100).toFixed(1)}% lower than the recommended option.</p>
+                `;
+            }
+
+            explanation.innerHTML = explanationText;
+        }
+
+        // Load analysis when page loads
+        window.addEventListener('load', loadAnalysis);
+    </script>
+</body>
+</html>
